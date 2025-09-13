@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import ConnectionDiagnostics from './ConnectionDiagnostics';
 import './SignalRApp.css';
 
 const SignalRApp = ({ 
@@ -13,7 +14,8 @@ const SignalRApp = ({
   leaveGroup, 
   sendMessageToGroup,
   clearMessages,
-  clearError 
+  clearError,
+  connectionState
 }) => {
   const [hubUrl, setHubUrl] = useState('https://localhost:7000/chathub');
   const [groupName, setGroupName] = useState('');
@@ -101,6 +103,14 @@ const SignalRApp = ({
             )}
           </div>
         </div>
+        
+        {/* Connection Diagnostics */}
+        {(connectionError || !isConnected) && (
+          <ConnectionDiagnostics 
+            hubUrl={hubUrl} 
+            connectionState={connectionState}
+          />
+        )}
       </div>
 
       {/* Groups Section */}

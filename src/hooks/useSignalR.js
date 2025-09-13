@@ -16,6 +16,18 @@ export const useSignalR = (hubUrl) => {
     setConnectionError(null);
     
     try {
+      // Validate URL format
+      if (!url || !url.trim()) {
+        throw new Error('Hub URL is required');
+      }
+      
+      // Basic URL validation
+      try {
+        new URL(url);
+      } catch {
+        throw new Error('Invalid Hub URL format');
+      }
+      
       await signalRService.startConnection(url);
       setIsConnected(true);
       
@@ -35,7 +47,21 @@ export const useSignalR = (hubUrl) => {
       });
 
     } catch (error) {
-      setConnectionError(error.message);
+      console.error('Connection failed:', error);
+      let errorMessage = error.message;
+      
+      // Provide more specific error messages
+      if (error.message.includes('Failed to start the connection')) {
+        errorMessage = 'Cannot connect to SignalR hub. Please check if the server is running and the URL is correct.';
+      } else if (error.message.includes('Connection closed with an error')) {
+        errorMessage = 'Connection was closed by the server. This may be due to authentication issues or server configuration.';
+      } else if (error.message.includes('ECONNREFUSED')) {
+        errorMessage = 'Connection refused. Please verify the server is running and accessible.';
+      } else if (error.message.includes('certificate')) {
+        errorMessage = 'SSL certificate error. For development, you may need to accept the certificate or use HTTP instead of HTTPS.';
+      }
+      
+      setConnectionError(errorMessage);
       setIsConnected(false);
     } finally {
       setIsConnecting(false);
@@ -110,7 +136,15 @@ export const useSignalR = (hubUrl) => {
     const handleDisconnection = (error) => {
       setIsConnected(false);
       if (error) {
-        setConnectionError(`Connection lost: ${error.message || 'Unknown error'}`);
+        console.error('Connection lost:', error);
+        let errorMessage = `Connection lost: ${error.message || 'Unknown error'}`;
+        
+        // Provide more specific disconnection error messages
+        if (error.message && error.message.includes('Connection closed with an error')) {
+          errorMessage = 'Connection was closed unexpectedly by the server. This may be due to network issues or server restart.';
+        }
+        
+        setConnectionError(errorMessage);
       }
     };
 
