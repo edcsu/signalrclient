@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import ConnectionDiagnostics from './ConnectionDiagnostics';
+import BackendHealthCheck from './BackendHealthCheck';
 import './SignalRApp.css';
 
 const SignalRApp = ({ 
@@ -106,10 +107,13 @@ const SignalRApp = ({
         
         {/* Connection Diagnostics */}
         {(connectionError || !isConnected) && (
-          <ConnectionDiagnostics 
-            hubUrl={hubUrl} 
-            connectionState={connectionState}
-          />
+          <>
+            <ConnectionDiagnostics 
+              hubUrl={hubUrl} 
+              connectionState={connectionState}
+            />
+            <BackendHealthCheck hubUrl={hubUrl} />
+          </>
         )}
       </div>
 
