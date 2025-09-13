@@ -16,9 +16,11 @@ const SignalRApp = ({
   sendMessageToGroup,
   clearMessages,
   clearError,
-  connectionState
+  connectionState,
+  testConnection,
+  testEcho
 }) => {
-  const [hubUrl, setHubUrl] = useState('https://localhost:7000/chathub');
+  const [hubUrl, setHubUrl] = useState('http://localhost:5000/chathub');
   const [groupName, setGroupName] = useState('');
   const [messageText, setMessageText] = useState('');
   const [selectedGroup, setSelectedGroup] = useState('');
@@ -98,9 +100,25 @@ const SignalRApp = ({
                 {isConnecting ? 'Connecting...' : 'Connect'}
               </button>
             ) : (
-              <button onClick={disconnect} className="disconnect-btn">
-                Disconnect
-              </button>
+              <>
+                <button onClick={disconnect} className="disconnect-btn">
+                  Disconnect
+                </button>
+                <button 
+                  onClick={testConnection} 
+                  className="test-btn"
+                  style={{ marginLeft: '10px', padding: '5px 10px', fontSize: '12px' }}
+                >
+                  Test Connection
+                </button>
+                <button 
+                  onClick={() => testEcho('Hello from client!')} 
+                  className="test-btn"
+                  style={{ marginLeft: '10px', padding: '5px 10px', fontSize: '12px' }}
+                >
+                  Test Echo
+                </button>
+              </>
             )}
           </div>
         </div>
@@ -202,14 +220,29 @@ const SignalRApp = ({
                 <div className="no-messages">No messages yet</div>
               ) : (
                 messages
-                  .filter(msg => msg.type === 'group' && msg.groupName === selectedGroup)
+                  .filter(msg => 
+                    (msg.type === 'group' && msg.groupName === selectedGroup) ||
+                    (msg.type === 'system' && msg.groupName === selectedGroup) ||
+                    (msg.type === 'echo')
+                  )
                   .map((message, index) => (
-                    <div key={index} className="message-item">
+                    <div key={index} className={`message-item ${message.type || 'group'}`}>
                       <div className="message-header">
-                        <span className="message-user">{message.user}</span>
+                        <span className={`message-user ${message.type || 'group'}`}>{message.user}</span>
                         <span className="message-time">
                           {message.timestamp.toLocaleTimeString()}
                         </span>
+                        {message.type && message.type !== 'group' && (
+                          <span className="message-type" style={{ 
+                            fontSize: '10px', 
+                            backgroundColor: '#e9ecef', 
+                            padding: '2px 6px', 
+                            borderRadius: '3px',
+                            marginLeft: '5px'
+                          }}>
+                            [{message.type}]
+                          </span>
+                        )}
                       </div>
                       <div className="message-content">{message.message}</div>
                     </div>

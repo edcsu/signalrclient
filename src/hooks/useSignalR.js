@@ -46,6 +46,62 @@ export const useSignalR = (hubUrl) => {
         }]);
       });
 
+      // Handle server events from C# hub
+      signalRService.onServerConnected((connectionId) => {
+        console.log('Server confirmed connection:', connectionId);
+      });
+
+      signalRService.onJoinedGroup((groupName) => {
+        console.log('Server confirmed joined group:', groupName);
+        // The group is already added by the joinGroup function
+      });
+
+      signalRService.onLeftGroup((groupName) => {
+        console.log('Server confirmed left group:', groupName);
+        // The group is already removed by the leaveGroup function
+      });
+
+      signalRService.onUserJoinedGroup((groupName, connectionId) => {
+        console.log(`User ${connectionId} joined group ${groupName}`);
+        setMessages(prev => [...prev, {
+          user: 'System',
+          message: `User joined the group`,
+          groupName,
+          timestamp: new Date(),
+          type: 'system'
+        }]);
+      });
+
+      signalRService.onUserLeftGroup((groupName, connectionId) => {
+        console.log(`User ${connectionId} left group ${groupName}`);
+        setMessages(prev => [...prev, {
+          user: 'System',
+          message: `User left the group`,
+          groupName,
+          timestamp: new Date(),
+          type: 'system'
+        }]);
+      });
+
+      signalRService.onError((errorMessage) => {
+        console.error('Server error:', errorMessage);
+        setConnectionError(`Server error: ${errorMessage}`);
+      });
+
+      signalRService.onConnectionId((connectionId) => {
+        console.log('Connection ID received:', connectionId);
+      });
+
+      signalRService.onEcho((echoMessage) => {
+        console.log('Echo received:', echoMessage);
+        setMessages(prev => [...prev, {
+          user: 'Echo',
+          message: echoMessage,
+          timestamp: new Date(),
+          type: 'echo'
+        }]);
+      });
+
     } catch (error) {
       console.error('Connection failed:', error);
       let errorMessage = error.message;
@@ -130,6 +186,28 @@ export const useSignalR = (hubUrl) => {
     setConnectionError(null);
   }, []);
 
+  // Test connection by getting connection ID
+  const testConnection = useCallback(async () => {
+    try {
+      await signalRService.connection?.invoke('GetConnectionId');
+      return true;
+    } catch (error) {
+      setConnectionError(`Connection test failed: ${error.message}`);
+      return false;
+    }
+  }, []);
+
+  // Test echo functionality
+  const testEcho = useCallback(async (message = 'Test message') => {
+    try {
+      await signalRService.connection?.invoke('Echo', message);
+      return true;
+    } catch (error) {
+      setConnectionError(`Echo test failed: ${error.message}`);
+      return false;
+    }
+  }, []);
+
   // Set up connection state listeners
   useEffect(() => {
     const handleConnection = () => setIsConnected(true);
@@ -175,6 +253,8 @@ export const useSignalR = (hubUrl) => {
     sendMessageToGroup,
     clearMessages,
     clearError,
+    testConnection,
+    testEcho,
     
     // Connection info
     connectionState: signalRService.getConnectionState()

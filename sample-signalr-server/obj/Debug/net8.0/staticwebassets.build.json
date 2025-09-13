@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "ZPLqSpXdSdb/NbrBaWuSiiCH45exMxyplVmtUKgw9HU=",
+  "Source": "SampleSignalRServer",
+  "BasePath": "_content/SampleSignalRServer",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}

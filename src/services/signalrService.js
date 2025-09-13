@@ -143,6 +143,55 @@ class SignalRService {
     }
   }
 
+  // Listen for server events that the C# hub sends
+  onServerConnected(callback) {
+    if (this.connection) {
+      this.connection.on('Connected', callback);
+    }
+  }
+
+  onJoinedGroup(callback) {
+    if (this.connection) {
+      this.connection.on('JoinedGroup', callback);
+    }
+  }
+
+  onLeftGroup(callback) {
+    if (this.connection) {
+      this.connection.on('LeftGroup', callback);
+    }
+  }
+
+  onUserJoinedGroup(callback) {
+    if (this.connection) {
+      this.connection.on('UserJoinedGroup', callback);
+    }
+  }
+
+  onUserLeftGroup(callback) {
+    if (this.connection) {
+      this.connection.on('UserLeftGroup', callback);
+    }
+  }
+
+  onError(callback) {
+    if (this.connection) {
+      this.connection.on('Error', callback);
+    }
+  }
+
+  onConnectionId(callback) {
+    if (this.connection) {
+      this.connection.on('ConnectionId', callback);
+    }
+  }
+
+  onEcho(callback) {
+    if (this.connection) {
+      this.connection.on('Echo', callback);
+    }
+  }
+
   // Add connection event listeners
   onConnected(callback) {
     this.connectionCallbacks.push(callback);
