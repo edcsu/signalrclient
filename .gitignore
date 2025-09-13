@@ -12,6 +12,20 @@ dist
 dist-ssr
 *.local
 
+# .NET build output
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.cache
+*.tmp
+
+# .NET user-specific files
+*.user
+*.userosscache
+*.sln.docstates
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
